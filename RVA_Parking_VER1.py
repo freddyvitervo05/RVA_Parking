@@ -81,6 +81,7 @@ def create_non_vcu_account():
 def show_frame(frame):
     """Hide all screens and display the requested screen."""
     for item in (
+        home_frame,
         registration_frame,
         duo_frame,
         login_frame,
@@ -93,6 +94,20 @@ def show_frame(frame):
 
     frame.pack(fill="both", expand=True, padx=20, pady=10)
 
+def cancel_registration():
+    """Cancelling registation clears pending registration data and returns to the registration screen."""
+    global pending_registration
+    answer = messagebox.askyesno(
+        title= 'Confirmation', 
+        message='Are you sure you want to cancel registation? All entered information will be lost.'
+        )
+    if answer:
+        pending_registration.clear()
+        show_frame(registration_frame)
+        messagebox.showinfo(
+            "Registration Cancelled",
+            "Your registration has been cancelled."
+        )
 
 def start_registration():
     """Validate registration information and route by account type."""
@@ -506,6 +521,7 @@ nav = tk.Frame(window)
 nav.pack(pady=5)
 
 registration_frame = tk.Frame(window)
+home_frame = tk.Frame(window)
 duo_frame = tk.Frame(window)
 login_frame = tk.Frame(window)
 add_vehicle_frame = tk.Frame(window)
@@ -526,6 +542,36 @@ def labeled_entry(parent, label, show=None):
 
     return entry
 
+# ---------------- HOME SCREEN ----------------
+
+tk.Label(
+    home_frame,
+    text="Welcome to RVA Parking",
+    font=("Arial", 15, "bold")
+).pack(pady=12)
+
+tk.Label(
+    home_frame,
+    text="Please register or log in to continue."
+).pack(pady=5)
+
+tk.Button(
+    home_frame,
+    text="Register",
+    command=lambda: show_frame(registration_frame)
+).pack(pady=5)
+
+tk.Button(
+    home_frame,
+    text="Login",
+    command=lambda: show_frame(login_frame)
+).pack(pady=5)
+
+tk.Button(
+    home_frame,
+    text="Continue as Guest",
+    command=continue_as_guest
+).pack(pady=5)
 
 # ---------------- REGISTRATION SCREEN ----------------
 
@@ -576,6 +622,12 @@ tk.Button(
     text="Continue Registration",
     command=start_registration
 ).pack(pady=8)
+
+tk.Button(
+    registration_frame,
+    text="Cancel Registration",
+    command=lambda: cancel_registration()
+).pack(pady=5)
 
 tk.Button(
     registration_frame,
@@ -810,6 +862,12 @@ zone_result.pack(pady=5)
 
 tk.Button(
     nav,
+    text="Home",
+    command=lambda: show_frame(home_frame)
+).pack(side="left", padx=5)
+
+tk.Button(
+    nav,
     text="Register",
     command=lambda: show_frame(registration_frame)
 ).pack(side="left", padx=5)
@@ -826,7 +884,7 @@ tk.Button(
 #).pack(side="left", padx=5)""
 
 
-show_frame(registration_frame)
+show_frame(home_frame)
 
 window.mainloop()
 
