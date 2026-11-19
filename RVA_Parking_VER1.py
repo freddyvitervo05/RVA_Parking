@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 import re
+import webbrowser
 
 MAX_LEN = 7
 MAX_MINUTES = 180
@@ -88,7 +89,7 @@ def show_frame(frame):
         add_vehicle_frame,
         vehicle_frame,
         parking_frame,
-        zone_frame
+        map_frame
     ):
         item.pack_forget()
 
@@ -449,39 +450,62 @@ def submit_time():
     )
 
     # After a valid parking duration, ask for the 6-digit parking zone.
-    zone_entry.delete(0, tk.END)
-    zone_result.config(text="")
-    show_frame(zone_frame)
+    street_entry.delete(0, tk.END)
+    
+    show_frame(map_frame)
+
+RICHMOND_MAP_URL = (
+    "https://cor.maps.arcgis.com/apps/webappviewer/index.html"
+    "?id=a49210548bc24ad08d7dc0bf1e2c77b3"
+)
 
 
-def submit_zone():
-    """Validate a 6-digit parking zone and confirm parking."""
-    zone = zone_entry.get().strip()
+def open_parking_map():
+    """Open the city's interactive parking map in the default browser."""
+    webbrowser.open(RICHMOND_MAP_URL)
 
-    if len(zone) != 6 or not zone.isdigit():
-        zone_result.config(
-            text="Error: Parking zone must be exactly 6 digits."
+
+#def continue_to_zone():
+ #   """Move from the map step to the parking zone entry screen."""
+  #  show_frame(zone_frame)
+
+
+def submit_street():
+    """Confirm parking using the selected street."""
+
+    street = street_entry.get().strip()
+
+    # Makes sure the user entered a street
+    if not street:
+        messagebox.showerror(
+            "Invalid Street",
+            "Please enter the street where you are parking."
         )
         return
 
+    # Gets the selected license plate
     plate = selected_vehicle
+
     if plate is None:
         plate = user_input.get().strip().upper()
 
-    messagebox.showinfo(
-        "Parking Confirmed",
-        f"Parking started for {plate} in Zone {zone}."
-    )
+    # Gets the parking duration
+    duration = time_input.get().strip()
 
-    zone_result.config(
-        text=f"Parking confirmed for {plate} in Zone {zone}."
+    # Displays the parking session details
+    messagebox.showinfo(
+        "Parking Session Confirmed",
+        f"Parking Session Complete!\n\n"
+        f"License Plate: {plate}\n"
+        f"Parking Duration: {duration}\n"
+        f"Street: {street}"
     )
 
 
 def exit_to_registration():
     # Clear parking information
-    zone_entry.delete(0, tk.END)
-    zone_result.config(text="")
+    street_entry.delete(0, tk.END)
+    
 
     time_input.delete(0, tk.END)
     time_result.config(text="")
@@ -527,7 +551,7 @@ login_frame = tk.Frame(window)
 add_vehicle_frame = tk.Frame(window)
 vehicle_frame = tk.Frame(window)
 parking_frame = tk.Frame(window)
-zone_frame = tk.Frame(window)
+map_frame = tk.Frame(window)
 
 
 def labeled_entry(parent, label, show=None):
@@ -822,40 +846,96 @@ tk.Button(
 ).pack(pady=15)
 
 
-# ---------------- PARKING ZONE SCREEN ----------------
+# ---------------- Richmond Paid Parking Map ----------------
 
 tk.Label(
-    zone_frame,
-    text="Enter Parking Zone",
-    font=("Arial", 15, "bold")
-).pack(pady=10)
+    map_frame,
+    text="Richmond Parking Map",
+    font=("Arial", 15,"bold")
+).pack(pady=12)
 
 tk.Label(
-    zone_frame,
-    text="Enter the 6-digit parking zone number:"
-).pack(pady=5)
-
-zone_entry = tk.Entry(zone_frame, width=20)
-zone_entry.pack(pady=5)
+    map_frame,
+    text="View the map before beggining your parking session",
+    wraplength=450,
+    justify="center"
+).pack(pady=12)
 
 tk.Button(
-    zone_frame,
-    text="Submit Zone",
-    command=submit_zone
+    map_frame,
+    text="Open Interactive Parking Map",
+    command=open_parking_map
 ).pack(pady=8)
 
+tk.Label(
+    map_frame,
+    text="Return to RVA Parking after viewing the map.",
+    wraplength=450,
+    justify="center"
+).pack(pady=12)
+
+# Asks the user for their parking street
+tk.Label(
+    map_frame,
+    text="Enter the street where you are parking:"
+).pack(pady=5)
+
+# Stores the street entered by the user
+street_entry = tk.Entry(
+    map_frame,
+    width=35
+)
+street_entry.pack(pady=5)
+
+# Completes the parking session
 tk.Button(
-    zone_frame,
+    map_frame,
+    text="Complete Parking Session",
+    command=submit_street
+).pack(pady=15)
+
+
+tk.Button(
+    map_frame,
     text="Exit",
     command=exit_to_registration
 ).pack(pady=10)
 
-zone_result = tk.Label(
-    zone_frame,
-    text="",
-    wraplength=450
-)
-zone_result.pack(pady=5)
+
+# ---------------- PARKING ZONE SCREEN ----------------
+
+#tk.Label(
+   # zone_frame,
+  #  text="Enter Parking Zone",
+ #   font=("Arial", 15, "bold")
+#).pack(pady=10)
+
+#tk.Label(
+  #  zone_frame,
+ #   text="Enter the 6-digit parking zone number:"
+#).pack(pady=5)
+
+#zone_entry = tk.Entry(zone_frame, width=20)
+#zone_entry.pack(pady=5)
+
+#tk.Button(
+  #  zone_frame,
+ #   text="Submit Zone",
+    #command=submit_zone
+#).pack(pady=8)
+
+#tk.Button(
+   # zone_frame,
+  #  text="Exit",
+ #   command=exit_to_registration
+#).pack(pady=10)
+
+#zone_result = tk.Label(
+   # zone_frame,
+  #  text="",
+ #   wraplength=450
+#)
+#zone_result.pack(pady=5)
 
 
 # ---------------- TOP NAVIGATION ----------------
