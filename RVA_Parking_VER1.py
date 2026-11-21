@@ -4,6 +4,7 @@ import re
 import webbrowser
 
 MAX_LEN = 7
+MIN_MINUTES = 5
 MAX_MINUTES = 180
 
 # Demo in-memory account storage.
@@ -437,7 +438,13 @@ def submit_time():
 
     total_minutes = (hours * 60) + minutes
 
-    if total_minutes < 5 or total_minutes > MAX_MINUTES:
+    if total_minutes < MIN_MINUTES:
+        time_result.config(
+            text="Error: Time must be between 00:05 and 03:00."
+        )
+        return
+
+    if total_minutes > MAX_MINUTES:
         time_result.config(
             text="Error: Time must be between 00:05 and 03:00."
         )
@@ -856,7 +863,7 @@ tk.Label(
 
 tk.Label(
     map_frame,
-    text="View the map before beggining your parking session",
+    text="View the map before beginning your parking session",
     wraplength=450,
     justify="center"
 ).pack(pady=12)
